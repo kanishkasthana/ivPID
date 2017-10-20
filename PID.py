@@ -43,7 +43,7 @@ class PID:
         self.sample_time = 0.00
         self.current_time = time.time()
         self.last_time = self.current_time
-
+        self.windup_guard= 20.0 #Defining windup gaurd just to be sure things don't get out of control
         self.clear()
 
     def clear(self):
@@ -60,6 +60,10 @@ class PID:
         self.windup_guard = 20.0
 
         self.output = 0.0
+
+    def clearI(self):
+        """Clears I term only"""
+        self.ITerm = 0.0
 
     def update(self, feedback_value):
         """Calculates PID value for given reference feedback
@@ -79,22 +83,23 @@ class PID:
         delta_time = self.current_time - self.last_time
         delta_error = error - self.last_error
 
+        # Remember last time and last error for next calculation
+        self.last_time = self.current_time
+        self.last_error = error
+
         if (delta_time >= self.sample_time):
             self.PTerm = self.Kp * error
             self.ITerm += error * delta_time
-
+           #We want to set the Iterm to zero if it increases too much or decreases too much.
+           # We can avoid oscillations because of Item overshooting this way.
             if (self.ITerm < -self.windup_guard):
-                self.ITerm = -self.windup_guard
+                self.ITerm = 0.0
             elif (self.ITerm > self.windup_guard):
-                self.ITerm = self.windup_guard
+                self.ITerm = 0.0
 
             self.DTerm = 0.0
             if delta_time > 0:
                 self.DTerm = delta_error / delta_time
-
-            # Remember last time and last error for next calculation
-            self.last_time = self.current_time
-            self.last_error = error
 
             self.output = self.PTerm + (self.Ki * self.ITerm) + (self.Kd * self.DTerm)
 
