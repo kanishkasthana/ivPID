@@ -43,7 +43,7 @@ class PID:
         self.sample_time = 0.00
         self.current_time = time.time()
         self.last_time = self.current_time
-        self.windup_guard= 20.0 #Defining windup gaurd just to be sure things don't get out of control
+        self.windup_guard = 200.0 #Defining windup gaurd just to be sure things don't get out of control
         self.clear()
 
     def clear(self):
@@ -57,7 +57,7 @@ class PID:
 
         # Windup Guard
         self.int_error = 0.0
-        self.windup_guard = 20.0
+        self.windup_guard = 200.0
 
         self.output = 0.0
 
@@ -93,15 +93,19 @@ class PID:
            #We want to set the Iterm to zero if it increases too much or decreases too much.
            # We can avoid oscillations because of Item overshooting this way.
             if (self.ITerm < -self.windup_guard):
-                self.ITerm = 0.0
+                self.ITerm = -self.windup_guard
             elif (self.ITerm > self.windup_guard):
-                self.ITerm = 0.0
+                self.ITerm = self.windup_guard
 
             self.DTerm = 0.0
             if delta_time > 0:
                 self.DTerm = delta_error / delta_time
 
             self.output = self.PTerm + (self.Ki * self.ITerm) + (self.Kd * self.DTerm)
+        return(self.output)
+
+    def setTargetValue(self, targetValue):
+        self.SetPoint = targetValue
 
     def setKp(self, proportional_gain):
         """Determines how aggressively the PID reacts to the current error with setting Proportional Gain"""
