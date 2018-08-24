@@ -43,7 +43,7 @@ class PID:
         self.sample_time = 0.00
         self.current_time = time.time()
         self.last_time = self.current_time
-        #self.windup_guard = 200.0 #Defining windup gaurd just to be sure things don't get out of control
+        self.windup_guard = 200.0 #Defining windup gaurd just to be sure things don't get out of control
         self.clear()
 
     def clear(self):
@@ -57,7 +57,7 @@ class PID:
 
         # Windup Guard
         self.int_error = 0.0
-        #self.windup_guard = 200.0
+        self.windup_guard = 200.0
 
         self.output = 0.0
 
@@ -91,10 +91,10 @@ class PID:
             self.PTerm = self.Kp * error
             self.ITerm += error * delta_time
            #Removing windup gaurd. It didn't seem to have an effect for my system.
-            #if (self.ITerm < -self.windup_guard):
-            #    self.ITerm = -self.windup_guard
-            #elif (self.ITerm > self.windup_guard):
-            #    self.ITerm = self.windup_guard
+            if (self.ITerm < -self.windup_guard):
+                self.ITerm = -self.windup_guard
+            elif (self.ITerm > self.windup_guard):
+                self.ITerm = self.windup_guard
 
             self.DTerm = 0.0
             if delta_time > 0:
