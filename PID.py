@@ -39,15 +39,16 @@ class PID:
         self.Kp = P
         self.Ki = I
         self.Kd = D
-
-        self.sample_time = 0.00
-        self.current_time = time.time()
-        self.last_time = self.current_time
-        self.windup_guard = 1000000.0 #Defining windup gaurd just to be sure things don't get out of control
+        self.flush=False
+        self.flush_pressure=0.0
         self.clear()
 
     def clear(self):
         """Clears PID computations and coefficients"""
+        self.sample_time = 0.00
+        self.current_time = time.time()
+        self.last_time = self.current_time
+        self.windup_guard = 1000000.0 #Defining windup gaurd just to be sure things don't get out of control
         self.SetPoint = 0.0
 
         self.PTerm = 0.0
@@ -60,6 +61,17 @@ class PID:
         self.windup_guard = 1000000.0
 
         self.output = 0.0
+       
+    def start_flush_at_pressure(self,pressure):
+        """Variable to set when flushing a particular channel at the pressure specified"""
+        self.flush=True
+        self.flush_pressure=pressure
+
+    def stop_flush(self):
+        """Stops flush and sets flush_pressure to 0.0"""
+        self.flush=False
+        self.flush_pressure=0.0
+        self.clear()
 
     def clearI(self):
         """Clears I term only"""
@@ -101,7 +113,11 @@ class PID:
                 self.DTerm = delta_error / delta_time
 
             self.output = self.PTerm + (self.Ki * self.ITerm) + (self.Kd * self.DTerm)
-        return(self.output)
+        #Adding functionality for flushing     
+        if self.flush is True:
+            return(self.flush_pressure)
+        else
+            return(self.output)
 
     def setTargetValue(self, targetValue):
         self.SetPoint = targetValue
