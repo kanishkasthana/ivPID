@@ -116,7 +116,7 @@ class PID:
         #Adding functionality for flushing     
         if self.flush is True:
             return(self.flush_pressure)
-        else
+        else:
             return(self.output)
 
     def setTargetValue(self, targetValue):
