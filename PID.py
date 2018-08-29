@@ -50,7 +50,7 @@ class PID:
         self.last_time = self.current_time
         self.windup_guard = 1000000.0 #Defining windup gaurd just to be sure things don't get out of control
         self.SetPoint = 0.0
-
+        self.flush=False
         self.PTerm = 0.0
         self.ITerm = 0.0
         self.DTerm = 0.0
@@ -71,6 +71,7 @@ class PID:
         """Stops flush and sets flush_pressure to 0.0"""
         self.flush=False
         self.flush_pressure=0.0
+        self.SetPoint=0.0
         self.clear()
 
     def clearI(self):
@@ -148,7 +149,9 @@ class PID:
 
     def getTargetValue(self):
         return(self.SetPoint)
-
+    
+    def getFlushValue(self):
+        return(self.flush)
 
     def setSampleTime(self, sample_time):
         """PID that should be updated at a regular interval.
