@@ -66,7 +66,29 @@ class PID:
         """Variable to set when flushing a particular channel at the pressure specified"""
         self.flush=True
         self.flush_pressure=pressure
+        
+    def restart_flow(self,newSetpoint,newI,lastOutput):
+        self.sample_time = 0.00
+        self.current_time = time.time()
+        self.last_time = self.current_time
+        self.windup_guard = 1000000.0 #Defining windup gaurd just to be sure things don't get out of control
+        self.flush=False
+        self.flush_pressure=0.0
+        self.PTerm = 0.0
+        self.ITerm = lastOutput/self.Ki
+        self.DTerm = 0.0
+        self.Ki=newI
+        self.last_error = 0.0
 
+        # Windup Guard
+        self.int_error = 0.0
+        self.windup_guard = 1000000.0
+
+        self.output = lastOutput
+        self.SetPoint = newSetpoint
+       
+        
+        
     def stop_flush(self):
         """Stops flush and sets flush_pressure to 0.0"""
         self.flush=False
