@@ -68,6 +68,7 @@ class PID:
         self.flush_pressure=pressure
         
     def restart_flow(self,newSetpoint,newI,lastOutput):
+        self.Ki=newI
         self.sample_time = 0.00
         self.current_time = time.time()
         self.last_time = self.current_time
@@ -77,7 +78,6 @@ class PID:
         self.PTerm = 0.0
         self.ITerm = lastOutput/self.Ki
         self.DTerm = 0.0
-        self.Ki=newI
         self.last_error = 0.0
 
         # Windup Guard
